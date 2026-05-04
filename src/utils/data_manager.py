@@ -12,10 +12,12 @@ class DataManager:
         self.input_path = input_path
         self.train_dir = self.data_path / "train"
         self.test_dir = self.data_path / "test"
-        self.train_transcripts_dir = self.train_dir / "transcripts"
-        self.test_transcripts_dir = self.test_dir / "transcripts"
         self.train_audio_dir = self.train_dir / "audio"
         self.test_audio_dir = self.test_dir / "audio"
+        self.train_transcripts_dir = self.train_dir / "transcripts"
+        self.test_transcripts_dir = self.test_dir / "transcripts"
+        self.train_transcripts_dir = self.train_dir / "transcripts"
+        self.test_transcripts_dir = self.test_dir / "transcripts"
 
     def get_total_input_duration(self):
         pass
@@ -42,4 +44,7 @@ class DataManager:
         metadata_df = pd.DataFrame({"audio_path": train_files_audio, "student_path": train_files_audio, "teacher_path": train_files_audio, })
 
         metadata_df.to_csv(self.train_audio_dir / "metadata.csv", index=False)
+
+    def transcripts_filler(self, text):
+       pass 
 
