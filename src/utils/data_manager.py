@@ -53,15 +53,31 @@ class DataManager:
             current_split_dir = self.dirs[split]
 
             audio_dir = self.get_path(split, "audio")
-            audio_files = [f for f in audio_dir.iterdir() if f.suffix == self.audio_file_extension]
-
             student_dir = self.get_path(split, "transcripts", "student")
-            student_files = [f for f in student_dir.iterdir() if f.suffix == self.transcripts_files_extension]
-
             teacher_dir = self.get_path(split, "transcripts", "teacher")
-            teacher_files = [f for f in teacher_dir.iterdir() if f.suffix == self.transcripts_files_extension]
 
-            metadata_df = pd.DataFrame({"audio_path": audio_files, "student_path": student_files, "teacher_path": teacher_files})
+            data = []
+
+            for audio_path in audio_dir.iterdir():
+                if audio_path.suffix != self.audio_file_extension:
+                    continue
+
+                file_name = audio_path.stem
+
+                s_trans = student_dir / f"{file_name}{self.transcripts_files_extension}"
+                t_trans = teacher_dir / f"{file_name}{self.transcripts_files_extension}"
+
+                if s_trans.exists() and t_trans.exists():
+                    data.append({
+                        "file_name": file_name,
+                        "audio_path": audio_path,
+                        "student_path": s_trans,
+                        "teacher_path": t_trans
+                    })
+                else:
+                    print(f"Error, no transcript for {file_name}")
+
+            metadata_df = pd.DataFrame(data)
             metadata_df.to_csv(current_split_dir / "metadata.csv", index=False)
 
 
@@ -73,7 +89,9 @@ class DataManager:
             reference_names = [f.stem for f in reference_files]
 
             for role in ["student", "teacher"]:
-                current_path = self.get_path(split, "transcripts", role)
+                current_dir = self.get_path(split, "transcripts", role)
 
                 for name in reference_names:
-                    open(current_path / f"{name}{self.transcripts_files_extension}", "x")
+                    current_path = current_dir / f"{name}{self.transcripts_files_extension}"
+                    with open(current_path, 'w'):
+                        pass

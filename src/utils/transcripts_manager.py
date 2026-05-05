@@ -4,3 +4,5 @@ class TranscriptsManager:
 
     def student_filler(self, text):
         pass
+
+
