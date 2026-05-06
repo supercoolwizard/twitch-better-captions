@@ -82,7 +82,7 @@ class DataManager:
 
 
     def transcripts_files_creator(self):
-        """creates empty transcript fiiles, for them to be then filled"""
+        """creates empty transcript files, for them to be then filled"""
         for split in ["train", "test"]: 
             reference_path = self.get_path(split, "audio")
             reference_files = [f for f in reference_path.iterdir() if f.suffix == self.audio_file_extension]
