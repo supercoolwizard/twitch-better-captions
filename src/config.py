@@ -6,6 +6,7 @@ import torch
 class Settings(BaseSettings):
     DATA_DIR: DirectoryPath = Path("data")
     INPUT_DIR: DirectoryPath = Path("input")
+    MODELS_DIR: DirectoryPath = Path("models")
 
     student_model: str = "UsefulSensors/moonshine-tiny"
     teacher_model: str ="openai/whisper-tiny"
