@@ -13,5 +13,5 @@ metadata_df = pd.read_csv(metadata_path)
 for index, row in metadata_df.iterrows():
     audio_path = row["audio_path"]
 
-    student_ft_transcript = student_ft.local_hf_transcribe(audio_path)
+    student_ft_transcript = student_ft.transcribe(audio_path)
     print(student_ft_transcript)

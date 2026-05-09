@@ -1,5 +1,7 @@
 from transformers import pipeline, AutoModelForSpeechSeq2Seq, AutoProcessor
 from peft import PeftModel, PeftConfig
+import torch
+import librosa
 
 class StudentModelFineTuned:
     def __init__(self, adapter_model_id, device):
@@ -7,23 +9,27 @@ class StudentModelFineTuned:
 
         config = PeftConfig.from_pretrained(adapter_model_id)
 
-        processor = AutoProcessor.from_pretrained(config.base_model_name_or_path)
-        base_model = AutoModelForSpeechSeq2Seq.from_pretrained(config.base_model_name_or_path)
-        # base_model.resize_token_embeddings(len(processor.tokenizer))
+        self.processor = AutoProcessor.from_pretrained(config.base_model_name_or_path)
 
-        base_model.resize_token_embeddings(32769)
-
-        model = PeftModel.from_pretrained(base_model, adapter_model_id)
-
-
-        self.pipe = pipeline(
-            "automatic-speech-recognition",
-            model=model,
-            tokenizer=processor.tokenizer,
-            feature_extractor=processor.feature_extractor,
-            device=self.device
+        base_model = AutoModelForSpeechSeq2Seq.from_pretrained(
+            config.base_model_name_or_path
         )
 
-    def local_hf_transcribe(self, input_path):
-        result = self.pipe(input_path)
-        return result["text"]
+        # during peft, adds dummy_token
+        base_model.resize_token_embeddings(len(self.processor.tokenizer)+1)
+
+        self.model = PeftModel.from_pretrained(base_model, adapter_model_id)
+        self.model.to(self.device)
+
+
+    def transcribe(self, input_path):
+        audio, sr = librosa.load(input_path, sr=16000)
+
+        input_features = self.processor(audio, sampling_rate=sr, return_tensors="pt").input_values
+        input_features = input_features.to(self.device).to(self.model.dtype)
+
+        with torch.no_grad():
+            predicted_ids = self.model.generate(input_features)
+
+        transcription = self.processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
+        return transcription
