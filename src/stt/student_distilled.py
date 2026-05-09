@@ -3,7 +3,7 @@ from peft import PeftModel, PeftConfig
 import torch
 import librosa
 
-class StudentModelFineTuned:
+class StudentModelDistilled:
     def __init__(self, adapter_model_id, device):
         self.device = device
 

@@ -3,7 +3,7 @@ from transformers import MoonshineForConditionalGeneration, TrainingArguments, T
 from transformers import AutoProcessor
 from peft import LoraConfig, get_peft_model
 from datasets import load_dataset, Audio
-from src.fine_tuning.fine_tuning import DataCollatorSpeechSeq2SeqWithPadding
+from src.fine_tuning.collator import DataCollatorSpeechSeq2SeqWithPadding
 import datasets
 
 model = MoonshineForConditionalGeneration.from_pretrained(settings.student_model)

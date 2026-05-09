@@ -56,6 +56,9 @@ class DataManager:
             student_dir = self.get_path(split, "transcripts", "student")
             teacher_dir = self.get_path(split, "transcripts", "teacher")
 
+            distilled_dir = None
+            if split == "test":
+                distilled_dir = self.get_path(split, "transcripts", "student_distilled")
             data = []
 
             for audio_path in audio_dir.iterdir():
@@ -67,13 +70,19 @@ class DataManager:
                 s_trans = student_dir / f"{file_name}{self.transcripts_files_extension}"
                 t_trans = teacher_dir / f"{file_name}{self.transcripts_files_extension}"
 
+                row = {
+                    "file_name": file_name,
+                    "audio_path": audio_path,
+                    "student_path": s_trans,
+                    "teacher_path": t_trans
+                }
+
+                if split == "test":
+                    d_trans = distilled_dir / f"{file_name}{self.transcripts_files_extension}"
+                    row["student_distilled_path" = d_trans]
+
                 if s_trans.exists() and t_trans.exists():
-                    data.append({
-                        "file_name": file_name,
-                        "audio_path": audio_path,
-                        "student_path": s_trans,
-                        "teacher_path": t_trans
-                    })
+                    data.append(row)
                 else:
                     print(f"Error, no transcript for {file_name}")
 
@@ -88,7 +97,11 @@ class DataManager:
             reference_files = [f for f in reference_path.iterdir() if f.suffix == self.audio_file_extension]
             reference_names = [f.stem for f in reference_files]
 
-            for role in ["student", "teacher"]:
+            roles = ["student", "teacher"]
+            if split == "test":
+                roles.append("student_distilled")
+
+            for role in roles:
                 current_dir = self.get_path(split, "transcripts", role)
 
                 for name in reference_names:
