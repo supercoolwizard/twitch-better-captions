@@ -79,7 +79,7 @@ class DataManager:
 
                 if split == "test":
                     d_trans = distilled_dir / f"{file_name}{self.transcripts_files_extension}"
-                    row["student_distilled_path" = d_trans]
+                    row["student_distilled_path"] = d_trans
 
                 if s_trans.exists() and t_trans.exists():
                     data.append(row)

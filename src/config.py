@@ -9,8 +9,9 @@ class Settings(BaseSettings):
     MODELS_DIR: DirectoryPath = Path("models")
 
     student_model: str = "UsefulSensors/moonshine-tiny"
-    teacher_model: str ="openai/whisper-tiny"
+    teacher_model: str = "openai/whisper-tiny"
 
     device: torch.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 
 settings = Settings()

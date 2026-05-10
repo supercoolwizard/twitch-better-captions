@@ -1,11 +1,8 @@
 from src.config import settings
-from src.utils.transcripts_manager import TranscriptsManager
 from src.stt.student import StudentModel
 from src.stt.teacher import TeacherModel
-import torch
 import pandas as pd
 
-tm = TranscriptsManager(settings.DATA_DIR)
 
 student = StudentModel(settings.student_model, settings.device)
 teacher = TeacherModel(settings.teacher_model, settings.device)
