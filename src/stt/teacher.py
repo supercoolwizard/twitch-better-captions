@@ -2,6 +2,7 @@ from transformers import pipeline
 
 class TeacherModel:
     def __init__(self, model_name, device):
+        self.metadata_column = "teacher_path"
         self.model_name = model_name
         self.device = device
         self.pipe = pipeline(

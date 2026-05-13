@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     student_model: str = "UsefulSensors/moonshine-tiny"
     teacher_model: str = "openai/whisper-tiny"
 
+    hf_username: str = HfApi().whoami()["name"]
+    hf_model_repo: str = f"{hf_username}/moonshine-lora-finetuned"
+
+
     device: torch.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 

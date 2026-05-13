@@ -20,7 +20,6 @@ for index, row in metadata_df.iterrows():
     student_distilled_path = row["student_distilled_path"]
 
     student_dist_transcript = student_dist.transcribe(audio_path)
-    print(student_dist_transcript)
 
     with open(str(student_distilled_path), "w") as f:
         f.write(student_dist_transcript)
