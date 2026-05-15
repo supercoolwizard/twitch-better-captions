@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+cd "$(dirname "$0")/.."
+export PYTHONPATH=$(pwd)
+
 echo "folder structure creation"
 python scripts/prepare_structure.py
 

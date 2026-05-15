@@ -20,10 +20,14 @@ def stupifier(file_path, start_time, duration):
     os.replace(temp_file, file_path)
 
 
-for split in ["train", "test"]:
-    metadata_path = settings.DATA_DIR / split / "metadata.csv"
-    metadata_df = pd.read_csv(metadata_path)
-    for index, row in metadata_df.iterrows():
-        audio_path = row["audio_path"]
+for file in settings.INPUT_DIR.iterdir():
+    if str(file)[-1] == "3":
+        stupifier(file, "00:30:00", "00:02:00")
 
-        stupifier(audio_path, "00:30:00", "00:02:00")
+# for split in ["train", "test"]:
+#     metadata_path = settings.DATA_DIR / split / "metadata.csv"
+#     metadata_df = pd.read_csv(metadata_path)
+#     for index, row in metadata_df.iterrows():
+#         audio_path = row["audio_path"]
+#
+#         stupifier(audio_path, "00:30:00", "00:02:00")

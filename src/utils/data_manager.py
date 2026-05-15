@@ -56,9 +56,6 @@ class DataManager:
             student_dir = self.get_path(split, "transcripts", "student")
             teacher_dir = self.get_path(split, "transcripts", "teacher")
 
-            distilled_dir = None
-            if split == "test":
-                distilled_dir = self.get_path(split, "transcripts", "student_distilled")
             data = []
 
             for audio_path in audio_dir.iterdir():
@@ -78,6 +75,7 @@ class DataManager:
                 }
 
                 if split == "test":
+                    distilled_dir = self.get_path(split, "transcripts", "student_distilled")
                     d_trans = distilled_dir / f"{file_name}{self.transcripts_files_extension}"
                     row["student_distilled_path"] = d_trans
 
