@@ -69,7 +69,7 @@ class StudentTrainer:
             hub_strategy="checkpoint",
             hub_token=self.hf_token,
             per_device_train_batch_size=1, # 8,
-            gradient_accumulation_steps=2,
+            gradient_accumulation_steps=2, 
             learning_rate=1e-4,
             warmup_steps=1, # 30,
             max_steps=2, # 100

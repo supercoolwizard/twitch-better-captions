@@ -1,8 +1,4 @@
 import argparse
-import pandas as pd
-import os
-from dotenv import load_dotenv
-from huggingface_hub import HFApi
 
 from src.stt.student import StudentModel
 from src.stt.teacher import TeacherModel

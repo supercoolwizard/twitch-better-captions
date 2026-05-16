@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from huggingface_hub import HfApi
 import os
+from src.config import settings
 
 def get_hf_token() -> str:
     load_dotenv("src/local_settings.env")
@@ -23,4 +24,10 @@ def get_hf_username() -> str:
 
 def get_repo_name() -> str:
     username = get_hf_username()
-    return f"{username}/moonshine-lora-finetuned"
+    return f"{username}/{settings.hf_repo_name}"
+
+
+def get_bucket_name() -> str:
+    username = get_hf_username()
+    return f"{username}/{settings.hf_bucket_name}"
+
