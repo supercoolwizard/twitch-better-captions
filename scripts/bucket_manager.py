@@ -12,7 +12,6 @@ def main():
 
     parser.add_argument(
         "--bucket_command",
-        required=True,
         choices=["create_bucket", "delete_bucket"]
     )
 
@@ -23,20 +22,25 @@ def main():
 
     args = parser.parse_args()
 
+    if not args.bucket_command and not args.dir_command:
+        parser.print_help()
+        return
+
     bms = BucketManagerService(get_bucket_name())
 
-    match args.bucket_command:
-        case "create_bucket":
-            bms.create_bucket()
-        case "delete_bucket":
-            bms.delete_bucket()
+    if args.bucket_command:
+        match args.bucket_command:
+            case "create_bucket":
+                bms.create_bucket()
+            case "delete_bucket":
+                bms.delete_bucket()
 
-    match args.dir_command:
-        case "upload_dir":
-            bms.upload_dir(settings.INPUT_DIR)
-        case "donwload_dir":
-            bms.download_dir(settings.INPUT_DIR)
-
+    if args.dir_command:
+        match args.dir_command:
+            case "upload_dir":
+                bms.upload_dir(settings.INPUT_DIR)
+            case "download_dir": 
+                bms.download_dir(settings.INPUT_DIR)
 
 if __name__ == "__main__":
     main()
