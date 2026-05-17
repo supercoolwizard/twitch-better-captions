@@ -10,37 +10,34 @@ def main():
         description="create/upload/delete/download data on hf bucket"
     )
 
-    parser.add_argument(
-        "--bucket_command",
-        choices=["create_bucket", "delete_bucket"]
-    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    parser.add_argument(
-        "--dir_command",
-        choices=["upload_dir", "download_dir"]
-    )
+    subparsers.add_parser("create_bucket")
+    subparsers.add_parser("delete_bucket")
+
+    upload_parser = subparsers.add_parser("upload_dir")
+    upload_parser.add_argument("dir_name", choices=["input", "data"])
+ 
+    download_parser = subparsers.add_parser("download_dir")
+    download_parser.add_argument("dir_name", choices=["input", "data"])
 
     args = parser.parse_args()
 
-    if not args.bucket_command and not args.dir_command:
-        parser.print_help()
-        return
+    # if not args.bucket_command and not args.dir_command:
+    #     parser.print_help()
+    #     return
 
     bms = BucketManagerService(get_bucket_name())
 
-    if args.bucket_command:
-        match args.bucket_command:
-            case "create_bucket":
-                bms.create_bucket()
-            case "delete_bucket":
-                bms.delete_bucket()
-
-    if args.dir_command:
-        match args.dir_command:
-            case "upload_dir":
-                bms.upload_dir(settings.INPUT_DIR)
-            case "download_dir": 
-                bms.download_dir(settings.INPUT_DIR)
+    match args.command:
+        case "create_bucket":
+            bms.create_bucket()
+        case "delete_bucket":
+            bms.delete_bucket()
+        case "upload_dir":
+            bms.upload_dir(args.dir_name)
+        case "download_dir": 
+            bms.download_dir(args.dir_name)
 
 if __name__ == "__main__":
     main()

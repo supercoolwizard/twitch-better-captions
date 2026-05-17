@@ -4,10 +4,20 @@ set -e
 cd "$(dirname "$0")/.."
 export PYTHONPATH=$(pwd)
 
+mkdir -p input
+mkdir -p data
+touch -c src/local_settings.env
+
+echo "folder structure creation"
+python scripts/prepare_structure.py
+
 echo "create bucket and push"
 python scripts/bucket_manager.py \
-  --bucket_command "create_bucket" \
-  --dir_command "upload_dir"
+  "create_bucket"
+
+python scripts/bucket_manager.py \
+  "upload_dir" \
+  "input"
 
 # python scripts/bucket_manager.py \
 #   --bucket_command "delete_bucket"
