@@ -66,17 +66,27 @@ class StudentTrainer:
             output_dir=str(self.settings.MODELS_DIR),
             push_to_hub=True,
             hub_model_id=self.hf_model_repo,
-            hub_strategy="checkpoint",
             hub_token=self.hf_token,
-            per_device_train_batch_size=1, # 8,
-            gradient_accumulation_steps=2, 
-            learning_rate=1e-4,
-            warmup_steps=1, # 30,
-            max_steps=2, # 100
-            fp16=False,
+            hub_strategy="every_save",
+
+            per_device_train_batch_size=2,
+            gradient_accumulation_steps=16,
+            dataloader_pin_memory=False,
+
+            learning_rate=2e-4,
+            lr_scheduler_type="cosine",
+            warmup_ratio=0.03,
+            weight_decay=0.0,
+            max_grad_norm=1.0,
+
+            bf16=True,
+
+            save_strategy="steps",
+            save_steps=200,
+            logging_steps=20,
+
             remove_unused_columns=False,
             label_names=["labels"],
-            dataloader_pin_memory=False,
         )
 
         trainer = Trainer(

@@ -9,8 +9,8 @@ class Settings(BaseSettings):
     INPUT_DIR: DirectoryPath = BASE_DIR / "input"
     MODELS_DIR: DirectoryPath = BASE_DIR / "models"
 
-    student_model: str = "UsefulSensors/moonshine-tiny"
-    teacher_model: str = "openai/whisper-tiny"
+    student_model: str = "UsefulSensors/moonshine-base"
+    teacher_model: str = "openai/whisper-large-v3"
 
     hf_repo_name: str = "moonshine-lora-finetuned"
     hf_bucket_name: str = "broadcasts-dataset"

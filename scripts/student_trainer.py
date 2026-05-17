@@ -2,8 +2,11 @@ from src.fine_tuning.student_trainer import StudentTrainer
 from src.adapters.huggingface import get_hf_token, get_repo_name
 from src.config import settings
 
+from dotenv import load_dotenv
+
 
 def main():
+    load_dotenv("src/local_settings.env")
     token = get_hf_token()
     repo = get_repo_name()
 

@@ -7,6 +7,8 @@ from src.services.transcription_service import TranscriptionService
 from src.adapters.huggingface import get_repo_name
 from src.config import settings
 
+from dotenv import load_dotenv
+
 
 def build_model(model_name: str):
     if model_name == "student":
@@ -20,6 +22,8 @@ def build_model(model_name: str):
 
 
 def main():
+    load_dotenv("src/local_settings.env")
+
     parser = argparse.ArgumentParser(
         description="run inference on an stt model of choice (student/teacher/student_distilled)"
     )
