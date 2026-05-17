@@ -16,7 +16,7 @@ class TranscriptionService:
                 audio_path = row["audio_path"]
                 output_path = row[column]
 
-                text = self.stt_instance.local_hf_transcribe(audio_path)
+                text = self.stt_instance.transcribe(audio_path)
 
                 with open(output_path, "w") as f:
                     f.write(text)

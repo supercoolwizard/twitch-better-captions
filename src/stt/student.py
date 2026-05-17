@@ -12,7 +12,7 @@ class StudentModel:
             device=self.device
         )
  
-    def local_hf_transcribe(self, input_path):
+    def transcribe(self, input_path):
         result = self.pipe(input_path)
         text = result["text"]
         return text

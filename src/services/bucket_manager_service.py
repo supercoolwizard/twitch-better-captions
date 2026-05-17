@@ -21,8 +21,8 @@ class BucketManagerService:
 
         cmd = [
             "hf", "buckets",
-            "sync", dir_name,
-            f"hf://buckets/{self.bucket_name}/{dir_name}"
+            "sync", str(dir_name),
+            f"hf://buckets/{self.bucket_name}/{dir_name.name}"
         ]
         subprocess.run(cmd, capture_output=True, text=True, check=True)
 

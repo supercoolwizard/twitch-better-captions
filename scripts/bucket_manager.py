@@ -23,10 +23,6 @@ def main():
 
     args = parser.parse_args()
 
-    # if not args.bucket_command and not args.dir_command:
-    #     parser.print_help()
-    #     return
-
     bms = BucketManagerService(get_bucket_name())
 
     match args.command:
@@ -35,7 +31,10 @@ def main():
         case "delete_bucket":
             bms.delete_bucket()
         case "upload_dir":
-            bms.upload_dir(args.dir_name)
+            if args.dir_name == "input":
+                bms.upload_dir(settings.INPUT_DIR)
+            elif args.dir_name == "data":
+                bms.upload_dir(settings.DATA_DIR)
         case "download_dir": 
             bms.download_dir(args.dir_name)
 
