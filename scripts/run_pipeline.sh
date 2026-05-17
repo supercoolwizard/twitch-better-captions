@@ -6,6 +6,7 @@ export PYTHONPATH=$(pwd)
 
 mkdir -p input
 mkdir -p data
+mkdir -p models
 touch -c src/local_settings.env
 
 echo "pull the input bucket from hf"
@@ -32,5 +33,5 @@ python scripts/transcripts_filler.py \
 
 echo "push data to hf"
 python scripts/bucket_manager.py \
-  --upload_dir "data"
+  "upload_dir" "data"
 
