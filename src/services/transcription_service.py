@@ -8,7 +8,7 @@ class TranscriptionService:
     def run(self):
         column = self.stt_instance.metadata_column
 
-        for split in ["train", "test"]:
+        for split in self.stt_instance.splits_to_process:
             metadata_path = self.settings.DATA_DIR / split / "metadata.csv"
             metadata_df = pd.read_csv(metadata_path)
 

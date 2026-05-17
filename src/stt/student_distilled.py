@@ -6,6 +6,7 @@ import librosa
 class StudentModelDistilled:
     def __init__(self, adapter_model_id, device):
         self.metadata_column = "student_distilled_path"
+        self.splits_to_process = ["test"]
         self.device = device
 
         config = PeftConfig.from_pretrained(adapter_model_id)
