@@ -1,37 +1,111 @@
-from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
+from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, WhisperForConditionalGeneration, pipeline
+from transformers import WhisperProcessor
+from peft import LoraConfig, get_peft_model
+from transformers import Trainer
+from transformers.data import data_collator
+from src.stt.providers.base_stt import STTModel
+from transformers import Seq2SeqTrainingArguments
+from src.stt.collator import DataCollatorSpeechSeq2SeqWithPadding
+from src.adapters.huggingface import *
 
-from src.stt.base import BaseSTTArchitecture
 
+class WhisperArchitecture(STTModel):
+    def __init__(self, model_id, device, torch_dtype):
+        super().__init__(model_id, device, torch_dtype)
 
-class WhisperSTT(BaseSTTArchitecture):
-    def __init__(self, device, torch_dtype):
+        self.model_id = model_id
         self.device = device
         self.torch_dtype = torch_dtype
 
-    def load_model(self, model_id):
-        model = AutoModelForSpeechSeq2Seq.from_pretrained(
-            model_id=model_id, 
-            torch_dtype=self.torch_dtype,
-        ).to(self.device)
+        self.data_collator = DataCollatorSpeechSeq2SeqWithPadding(self.processor)
+        self.model = WhisperForConditionalGeneration.from_pretrained(self.model_id)
+        self.processor = WhisperProcessor.from_pretrained(self.model_id)
 
-        return model
 
-    def load_processor(self, model_id):
-        processor = AutoProcessor.from_pretrained(model_id)
+    def prepare_inputs(self, sample):
+        inputs = self.processor(
+            sample["array"],
+            sampling_rate=sample["sampling_rate"],
+            return_tensors="pt",
+            padding="longest",
+            return_attention_mask=True,
+        ).to(self.device, dtype=self.torch_dtype)
+        return inputs
 
-        return processor
 
-    def transcribe(self, model, processor, audio_path):
-        pipe = pipeline(
-            "automatic-speech-recognition",
-            model=model,
-            tokenizer=processor.tokenizer,
-            feature_extractor=processor.feature_extractor,
-            torch_dtype=self.torch_dtype,
-            device=self.device,
+    def _prepare_sample(self, batch):
+        sample = batch["audio"]
+        inputs = self.prepare_inputs(sample)
+        batch["input_features"] = inputs.input_features[0]
+
+        with open(batch["teacher_path"], "r", encoding="utf-8") as f:
+            transcript = f.read().strip()
+
+        batch["labels"] = self.processor.tokenizer(transcript).input_ids
+        return batch
+
+
+    def transcribe(self, sample):
+        inputs = self.prepare_inputs(sample)
+        pred_ids = self.model.generate(
+            **inputs,
+            task="transcribe",
+            language="en",
+            return_timestamps=True
         )
-        result = pipe(audio_path)
+        pred_text = self.processor.batch_decode(pred_ids)
 
-        return result["text"]
+        return pred_text
+
+
+    def setup_model_for_train(self, model, processor):
+        processor.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+        model.resize_token_embeddings(len(processor.tokenizer))
+        model.config.pad_token_id = processor.tokenizer.pad_token_id
+
+        config = LoraConfig(
+            r=16,
+            lora_alpha=32,
+            target_modules=["q_proj", "v_proj", "k_proj"],
+            task_type=None
+        )
+        return get_peft_model(model, config)
+
+
+    def train(self, dataset):
+        model = self.setup_model_for_train(self.model, self.processor)
+        dataset = dataset.map(self._prepare_sample, remove_columns=list(dataset.column_names))
+
+        training_args = Seq2SeqTrainingArguments(
+            push_to_hub=True,
+            hub_model_id=get_repo_name(),
+            hub_token=get_hf_token(),
+            hub_strategy="every_save",
+
+            per_device_train_batch_size=2,
+            gradient_accumulation_steps=16,
+            dataloader_pin_memory=False,
+
+            learning_rate=1e-5,
+            lr_scheduler_type="cosine",
+            warmup_ratio=0.03,
+
+            bf16=True,
+
+            save_strategy="steps",
+            save_steps=1,
+            logging_steps=1,
+
+            remove_unused_columns=False,
+            label_names=["labels"],
+        )
+
+        trainer = Trainer(
+            model=model,
+            args=training_args,
+            train_dataset=dataset,
+            data_collator=self.data_collator
+        )
+        trainer.train()
 
 

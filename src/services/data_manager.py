@@ -69,7 +69,7 @@ class DataManager:
 
                 row = {
                     "file_name": file_name,
-                    "audio_path": audio_path,
+                    "audio": audio_path,
                     "student_path": s_trans,
                     "teacher_path": t_trans
                 }

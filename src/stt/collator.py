@@ -8,7 +8,7 @@ class DataCollatorSpeechSeq2SeqWithPadding:
         input_features = []
         label_features = []
         for feature in features:
-            input_features.append({"input_values": feature["input_values"]})
+            input_features.append({"input_features": feature["input_features"]})
             label_features.append({"input_ids": feature["labels"]})
 
         batch = self.processor.feature_extractor.pad(input_features, return_tensors="pt")

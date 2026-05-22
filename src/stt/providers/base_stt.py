@@ -1,16 +1,19 @@
 from abc import ABC, abstractmethod
+from dotenv import load_dotenv
+import os 
 
-class BaseSTTArchitecture(ABC):
+class STTModel(ABC):
+    def __init__(self, model_id, device, torch_dtype):
+        load_dotenv("src/local_settings.env")
+        self.model_id = model_id
+        self.device = device
+        self.torch_dtype = torch_dtype
 
     @abstractmethod
-    def load_model(self, model_id):
+    def transcribe(self, sample):
         pass
 
     @abstractmethod
-    def prepare_for_training(self, audio_path, transcript_path):
-        pass
-
-    @abstractmethod
-    def transcribe(self, model, audio_path):
+    def train(self, dataset, training_args, data_collator):
         pass
 
