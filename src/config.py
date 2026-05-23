@@ -4,10 +4,18 @@ from pathlib import Path
 import torch
 
 class Settings(BaseSettings):
-    BASE_DIR: DirectoryPath = Path(__file__).resolve().parent.parent
-    DATA_DIR: DirectoryPath = BASE_DIR / "data"
-    INPUT_DIR: DirectoryPath = BASE_DIR / "input"
-    MODELS_DIR: DirectoryPath = BASE_DIR / "models"
+    # BASE_DIR: DirectoryPath = Path(__file__).resolve().parent.parent
+    # DATA_DIR: DirectoryPath = BASE_DIR / "data"
+    # INPUT_DIR: DirectoryPath = BASE_DIR / "input"
+    # MODELS_DIR: DirectoryPath = BASE_DIR / "models"
+
+    DATA_DIR: DirectoryPath = Path("data")
+    INPUT_DIR: DirectoryPath = Path("input")
+    MODELS_DIR: DirectoryPath = Path("models")
+
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    INPUT_DIR.mkdir(parents=True, exist_ok=True)
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
     student_model: str = "openai/whisper-tiny"
     teacher_model: str = "openai/whisper-large-v3"

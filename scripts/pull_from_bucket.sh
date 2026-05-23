@@ -4,12 +4,8 @@ set -e
 cd "$(dirname "$0")/.."
 export PYTHONPATH=$(pwd)
 
-mkdir -p input
-mkdir -p data
-mkdir -p models
+python app/manage_buckets.py \
+  download-dir "input"
 
-python scripts/bucket_manager.py \
-  "download_dir" "input"
-
-python scripts/bucket_manager.py \
-  "download_dir" "data"
+python app/manage_buckets.py \
+  download_dir "data"

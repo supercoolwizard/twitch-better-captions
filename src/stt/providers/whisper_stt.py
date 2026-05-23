@@ -5,8 +5,9 @@ from transformers import Trainer
 from transformers.data import data_collator
 from src.stt.providers.base_stt import STTModel
 from transformers import Seq2SeqTrainingArguments
-from src.stt.collator import DataCollatorSpeechSeq2SeqWithPadding
+from src.stt.collators.whisper_collator import DataCollatorSpeechSeq2SeqWithPadding
 from src.adapters.huggingface import *
+from peft import PeftModel
 
 
 class WhisperArchitecture(STTModel):
@@ -17,9 +18,9 @@ class WhisperArchitecture(STTModel):
         self.device = device
         self.torch_dtype = torch_dtype
 
-        self.data_collator = DataCollatorSpeechSeq2SeqWithPadding(self.processor)
         self.model = WhisperForConditionalGeneration.from_pretrained(self.model_id)
         self.processor = WhisperProcessor.from_pretrained(self.model_id)
+        self.data_collator = DataCollatorSpeechSeq2SeqWithPadding(self.processor)
 
 
     def prepare_inputs(self, sample):
@@ -59,9 +60,8 @@ class WhisperArchitecture(STTModel):
 
 
     def setup_model_for_train(self, model, processor):
-        processor.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-        model.resize_token_embeddings(len(processor.tokenizer))
-        model.config.pad_token_id = processor.tokenizer.pad_token_id
+        processor.tokenizer.pad_token = processor.tokenizer.eos_token
+        model.config.pad_token_id = processor.tokenizer.eos_token_id
 
         config = LoraConfig(
             r=16,
@@ -107,5 +107,7 @@ class WhisperArchitecture(STTModel):
             data_collator=self.data_collator
         )
         trainer.train()
+        trainer.push_to_hub()
+        self.processor.push_to_hub(get_repo_name())
 
 

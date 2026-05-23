@@ -5,3 +5,4 @@ __pycache__
 input/
 models/
 *.env
+trainer_output/

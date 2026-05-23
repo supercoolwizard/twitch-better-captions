@@ -14,6 +14,6 @@ class STTModel(ABC):
         pass
 
     @abstractmethod
-    def train(self, dataset, training_args, data_collator):
+    def train(self, dataset):
         pass
 
