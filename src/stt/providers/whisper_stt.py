@@ -23,6 +23,7 @@ class WhisperArchitecture(STTModel):
         self.data_collator = DataCollatorSpeechSeq2SeqWithPadding(self.processor)
 
 
+
     def prepare_inputs(self, sample):
         inputs = self.processor(
             sample["array"],
@@ -46,17 +47,39 @@ class WhisperArchitecture(STTModel):
         return batch
 
 
-    def transcribe(self, sample):
-        inputs = self.prepare_inputs(sample)
-        pred_ids = self.model.generate(
-            **inputs,
-            task="transcribe",
-            language="en",
-            return_timestamps=True
-        )
-        pred_text = self.processor.batch_decode(pred_ids)
+    def chunk_audio(self, audio, sr, chunk_s=30):
+        chunk_size = sr * chunk_s
+        for i in range(0, len(audio), chunk_size):
+            yield audio[i:i+chunk_size]
 
-        return pred_text
+
+    def transcribe(self, sample):
+        all_text = []
+
+        for chunk in self.chunk_audio(sample["array"], sample["sampling_rate"]):
+            inputs = self.processor(
+                chunk,
+                sampling_rate=16000,
+                return_tensors="pt"
+            )
+
+            inputs = {k: v.to(self.device) for k, v in inputs.items()}
+
+            pred_ids = self.model.generate(
+                **inputs,
+                task="transcribe",
+                language="en"
+            )
+
+            text = self.processor.batch_decode(
+                pred_ids,
+                skip_special_tokens=True
+            )[0]
+
+            all_text.append(text)
+
+        final = " ".join(all_text)
+        return final
 
 
     def setup_model_for_train(self, model, processor):
