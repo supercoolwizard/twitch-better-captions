@@ -11,7 +11,7 @@ python app/manage_data.py \
 
 echo "create bucket and push"
 python app/manage_buckets.py \
-  "create_bucket"
+  create-bucket
 
 python app/manage_buckets.py \
-  upload_dir "input"
+  upload-dir "input"

@@ -8,4 +8,4 @@ python app/manage_buckets.py \
   download-dir "input"
 
 python app/manage_buckets.py \
-  download_dir "data"
+  download-dir "data"
