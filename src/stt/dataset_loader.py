@@ -17,7 +17,7 @@ class DatasetLoader:
 
 
     def load_dataset(self, split):
-        split = str(split)
+        split = split.value
 
         dataset = load_dataset(
             "csv", 

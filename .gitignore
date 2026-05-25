@@ -6,3 +6,4 @@ input/
 models/
 *.env
 trainer_output/
+*.egg-info/

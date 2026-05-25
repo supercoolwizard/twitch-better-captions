@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "twitch-better-captions"
+version = "0.1.0"
+
+dependencies = [
+    "typer"
+]
+
+[project.scripts]
+app = "app.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["app*", "src*"]

@@ -4,7 +4,7 @@ import pandas as pd
 from src.config import settings
 
 
-def stupifier(file_path, start_time, duration):
+def audio_cutter(file_path, start_time, duration):
     temp_file = "temp_output.mp3"
 
     cmd = [
@@ -22,7 +22,7 @@ def stupifier(file_path, start_time, duration):
 
 for file in settings.INPUT_DIR.iterdir():
     if str(file)[-1] == "3":
-        stupifier(file, "00:30:00", "00:02:00")
+        audio_cutter(file, "00:30:00", "00:02:00")
 
 # for split in ["train", "test"]:
 #     metadata_path = settings.DATA_DIR / split / "metadata.csv"

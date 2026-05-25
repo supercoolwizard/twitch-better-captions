@@ -24,6 +24,10 @@ def create_bucket():
 def delete_bucket():
     bms.delete_bucket()
 
+# @app.command()
+# def clear_remote_dir(dir_name: DirName):
+#     bms.clear_remote_dir(path_map[dir_name])
+
 @app.command()
 def upload_dir(dir_name: DirName):
     bms.upload_dir(path_map[dir_name])

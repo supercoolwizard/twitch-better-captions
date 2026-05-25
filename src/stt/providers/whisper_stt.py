@@ -18,7 +18,7 @@ class WhisperArchitecture(STTModel):
         self.device = device
         self.torch_dtype = torch_dtype
 
-        self.model = WhisperForConditionalGeneration.from_pretrained(self.model_id)
+        self.model = WhisperForConditionalGeneration.from_pretrained(self.model_id).to(self.device, dtype=self.torch_dtype)
         self.processor = WhisperProcessor.from_pretrained(self.model_id)
         self.data_collator = DataCollatorSpeechSeq2SeqWithPadding(self.processor)
 
@@ -82,13 +82,13 @@ class WhisperArchitecture(STTModel):
             hub_token=get_hf_token(),
             hub_strategy="every_save",
 
-            per_device_train_batch_size=2,
-            gradient_accumulation_steps=16,
+            per_device_train_batch_size=4,
+            gradient_accumulation_steps=8,
             dataloader_pin_memory=False,
 
-            learning_rate=1e-5,
+            learning_rate=1e-4,
             lr_scheduler_type="cosine",
-            warmup_ratio=0.03,
+            warmup_ratio=0.05,
 
             bf16=True,
 
