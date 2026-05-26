@@ -18,7 +18,7 @@ class TranscriptionService:
             audio = sample["audio"]
             output_path = sample[self._match_role_to_path(role)]
 
-            transcript = stt_instance.transcribe(audio)[0]
+            transcript = stt_instance.transcribe(audio)
 
             with open(output_path, "w") as f:
                 f.write(transcript)

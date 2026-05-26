@@ -23,7 +23,6 @@ class WhisperArchitecture(STTModel):
         self.data_collator = DataCollatorSpeechSeq2SeqWithPadding(self.processor)
 
 
-
     def prepare_inputs(self, sample):
         inputs = self.processor(
             sample["array"],
@@ -52,34 +51,54 @@ class WhisperArchitecture(STTModel):
         for i in range(0, len(audio), chunk_size):
             yield audio[i:i+chunk_size]
 
-
+    ### transcription using pipeline automatic chunking
     def transcribe(self, sample):
-        all_text = []
+        pipe = pipeline(
+            "automatic-speech-recognition",
+            model=self.model,
+            tokenizer=self.processor.tokenizer,
+            feature_extractor=self.processor.feature_extractor,
+            torch_dtype=self.torch_dtype,
+            device=self.device,
+            return_timestamps=True,
+        )
 
-        for chunk in self.chunk_audio(sample["array"], sample["sampling_rate"]):
-            inputs = self.processor(
-                chunk,
-                sampling_rate=16000,
-                return_tensors="pt"
-            )
+        result = pipe(sample)
 
-            inputs = {k: v.to(self.device) for k, v in inputs.items()}
+        full_text = " ".join(
+            chunk["text"] for chunk in result["chunks"]
+        )
 
-            pred_ids = self.model.generate(
-                **inputs,
-                task="transcribe",
-                language="en"
-            )
+        return full_text
 
-            text = self.processor.batch_decode(
-                pred_ids,
-                skip_special_tokens=True
-            )[0]
+    ### transcription using chunks of 30s
+    # def transcribe(self, sample):
+    #     pipe = pipeline(
+    #         "automatic-speech-recognition",
+    #         model=self.model,
+    #         tokenizer=self.processor.tokenizer,
+    #         feature_extractor=self.processor.feature_extractor,
+    #         chunk_length_s=30,
+    #         batch_size=16, 
+    #         torch_dtype=self.torch_dtype,
+    #         device=self.device,
+    #     )
+    #     result = pipe(sample)
+    #     return result["text"]
 
-            all_text.append(text)
-
-        final = " ".join(all_text)
-        return final
+    ### transcription using native .gnerate method of the model
+    # def transcribe(self, sample):
+    #     inputs = self.prepare_inputs(sample)
+    #     pred_ids = self.model.generate(
+    #         **inputs,
+    #         task="transcribe",
+    #         language="en",
+    #         return_timestamps=True
+    #     )
+    #     pred_text = self.processor.batch_decode(pred_ids)
+    #     pred_text = pred_text[0]
+    #
+    #     return pred_text
 
 
     def setup_model_for_train(self, model, processor):

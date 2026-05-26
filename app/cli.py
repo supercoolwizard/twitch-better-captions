@@ -1,9 +1,9 @@
 import typer
 
 from app.manage_buckets import app as manage_buckets
-from app.manage_data import app as fill_transcripts
-from app.train_student import app as manage_data
-from app.fill_transcripts import app as train_student
+from app.manage_data import app as manage_data
+from app.train_student import app as train_student
+from app.fill_transcripts import app as fill_transcripts
 
 app = typer.Typer()
 
