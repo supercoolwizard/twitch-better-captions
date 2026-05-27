@@ -10,6 +10,7 @@ from src.adapters.huggingface import *
 from peft import PeftModel
 
 
+
 class WhisperArchitecture(STTModel):
     def __init__(self, model_id, device, torch_dtype):
         super().__init__(model_id, device, torch_dtype)
@@ -33,6 +34,7 @@ class WhisperArchitecture(STTModel):
         )
 
 
+
     def prepare_inputs(self, sample):
         inputs = self.processor(
             sample["array"],
@@ -47,58 +49,26 @@ class WhisperArchitecture(STTModel):
     def _prepare_sample(self, batch):
         sample = batch["audio"]
         inputs = self.prepare_inputs(sample)
+
         batch["input_features"] = inputs.input_features[0]
 
-        with open(batch["teacher_path"], "r", encoding="utf-8") as f:
-            transcript = f.read().strip()
 
-        batch["labels"] = self.processor.tokenizer(transcript).input_ids
+        batch["labels"] = self.processor.tokenizer(
+            batch["text"],
+            truncation=True,
+        ).input_ids
         return batch
 
 
-    def chunk_audio(self, audio, sr, chunk_s=30):
-        chunk_size = sr * chunk_s
-        for i in range(0, len(audio), chunk_size):
-            yield audio[i:i+chunk_size]
-
-    ### transcription using pipeline automatic chunking
     def transcribe(self, sample):
         result = self.pipe(sample)
 
-        full_text = " ".join(
-            chunk["text"] for chunk in result["chunks"]
-        )
+        formatted_chunks = [
+            f"[{chunk['timestamp'][0]:.2f}:{chunk['timestamp'][1]:.2f}] {chunk['text']}"
+            for chunk in result["chunks"]
+        ]
 
-        return full_text
-
-    ### transcription using chunks of 30s
-    # def transcribe(self, sample):
-    #     pipe = pipeline(
-    #         "automatic-speech-recognition",
-    #         model=self.model,
-    #         tokenizer=self.processor.tokenizer,
-    #         feature_extractor=self.processor.feature_extractor,
-    #         chunk_length_s=30,
-    #         batch_size=16, 
-    #         torch_dtype=self.torch_dtype,
-    #         device=self.device,
-    #     )
-    #     result = pipe(sample)
-    #     return result["text"]
-
-    ### transcription using native .gnerate method of the model
-    # def transcribe(self, sample):
-    #     inputs = self.prepare_inputs(sample)
-    #     pred_ids = self.model.generate(
-    #         **inputs,
-    #         task="transcribe",
-    #         language="en",
-    #         return_timestamps=True
-    #     )
-    #     pred_text = self.processor.batch_decode(pred_ids)
-    #     pred_text = pred_text[0]
-    #
-    #     return pred_text
+        return "\n".join(formatted_chunks)
 
 
     def setup_model_for_train(self, model, processor):

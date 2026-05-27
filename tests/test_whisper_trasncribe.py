@@ -9,7 +9,7 @@ student = WhisperArchitecture(
 )
 
 dataset_loader = DatasetLoader(settings)
-dataset = dataset_loader.load_dataset("train")
+dataset = dataset_loader.load_dataset_for_transcription("train")
 inputs = dataset[0]["audio"]
 
 # print(dataset)

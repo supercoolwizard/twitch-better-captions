@@ -21,7 +21,7 @@ def train(
     split: Annotated[SplitName, typer.Option("--split")]
 ):
     dataset_loader = DatasetLoader(settings)
-    dataset = dataset_loader.load_dataset(split.value)
+    dataset = dataset_loader.load_dataset_for_train(split.value)
     student = load_student()
     student.train(dataset)
 

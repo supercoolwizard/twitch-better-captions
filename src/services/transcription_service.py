@@ -12,7 +12,7 @@ class TranscriptionService:
             return "student_distilled_path"
 
     def run(self, stt_instance, role, split):
-        dataset = self.dataset_loader.load_dataset(split)
+        dataset = self.dataset_loader.load_dataset_for_transcription(split)
 
         for sample in dataset:
             audio = sample["audio"]

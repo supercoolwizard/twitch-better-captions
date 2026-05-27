@@ -11,6 +11,6 @@ student = WhisperArchitecture(
 )
 
 dataset_loader = DatasetLoader(settings)
-dataset = dataset_loader.load_dataset("train")
+dataset = dataset_loader.load_dataset_for_train("train")
 
 student.train(dataset)
