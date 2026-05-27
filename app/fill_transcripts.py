@@ -33,11 +33,11 @@ def transcribe(
     role: Annotated[Roles, typer.Option("--role")],
     split: Annotated[SplitName, typer.Option("--split")]
 ):
-    stt_instance = get_instance(role)
+    stt_instance = get_instance(role.value)
     dataset_loader = DatasetLoader(settings)
     service = TranscriptionService(dataset_loader)
 
-    service.run(stt_instance, role, split)
+    service.run(stt_instance, role.value, split.value)
 
 
 if __name__ == "__main__":

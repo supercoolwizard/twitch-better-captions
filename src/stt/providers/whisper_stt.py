@@ -22,6 +22,16 @@ class WhisperArchitecture(STTModel):
         self.processor = WhisperProcessor.from_pretrained(self.model_id)
         self.data_collator = DataCollatorSpeechSeq2SeqWithPadding(self.processor)
 
+        self.pipe = pipeline(
+            "automatic-speech-recognition",
+            model=self.model,
+            tokenizer=self.processor.tokenizer,
+            feature_extractor=self.processor.feature_extractor,
+            torch_dtype=self.torch_dtype,
+            device=self.device,
+            return_timestamps=True,
+        )
+
 
     def prepare_inputs(self, sample):
         inputs = self.processor(
@@ -53,17 +63,7 @@ class WhisperArchitecture(STTModel):
 
     ### transcription using pipeline automatic chunking
     def transcribe(self, sample):
-        pipe = pipeline(
-            "automatic-speech-recognition",
-            model=self.model,
-            tokenizer=self.processor.tokenizer,
-            feature_extractor=self.processor.feature_extractor,
-            torch_dtype=self.torch_dtype,
-            device=self.device,
-            return_timestamps=True,
-        )
-
-        result = pipe(sample)
+        result = self.pipe(sample)
 
         full_text = " ".join(
             chunk["text"] for chunk in result["chunks"]
@@ -119,6 +119,8 @@ class WhisperArchitecture(STTModel):
         dataset = dataset.map(self._prepare_sample, remove_columns=list(dataset.column_names))
 
         training_args = Seq2SeqTrainingArguments(
+            output_dir = str(settings.MODELS_DIR),
+
             push_to_hub=True,
             hub_model_id=get_repo_name(),
             hub_token=get_hf_token(),
@@ -134,9 +136,11 @@ class WhisperArchitecture(STTModel):
 
             bf16=True,
 
+            num_train_epochs=3,
+
             save_strategy="steps",
-            save_steps=1,
-            logging_steps=1,
+            save_steps=100,
+            logging_steps=10,
 
             remove_unused_columns=False,
             label_names=["labels"],

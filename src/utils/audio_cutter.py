@@ -22,7 +22,7 @@ def audio_cutter(file_path, start_time, duration):
 
 for file in settings.INPUT_DIR.iterdir():
     if str(file)[-1] == "3":
-        audio_cutter(file, "00:30:00", "00:30:00")
+        audio_cutter(file, "00:30:00", "01:00:00")
 
 # for split in ["train", "test"]:
 #     metadata_path = settings.DATA_DIR / split / "metadata.csv"
