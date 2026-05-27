@@ -3,10 +3,9 @@ from enum import Enum
 from typing import Annotated
 from src.config import settings
 from src.services.transcription_service import TranscriptionService
-from src.stt.dataset_loader import DatasetLoader
-from src.stt.providers.whisper_stt import WhisperArchitecture
+from src.stt.dataset_for_transcribe_loader import DatasetTranscribeLoader
 from src.adapters.huggingface import *
-from src.stt.providers.whisper_stt import WhisperArchitecture
+from src.stt.whisper.whisper_stt import WhisperArchitecture
 
 app = typer.Typer()
 
@@ -34,7 +33,7 @@ def transcribe(
     split: Annotated[SplitName, typer.Option("--split")]
 ):
     stt_instance = get_instance(role.value)
-    dataset_loader = DatasetLoader(settings)
+    dataset_loader = DatasetTranscribeLoader(settings, stt_instance.processor)
     service = TranscriptionService(dataset_loader)
 
     service.run(stt_instance, role.value, split.value)

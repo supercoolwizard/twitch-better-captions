@@ -2,9 +2,10 @@ import typer
 from enum import Enum
 from typing import Annotated
 from src.adapters.huggingface import *
-from src.stt.providers.whisper_stt import WhisperArchitecture
-from src.stt.dataset_loader import DatasetLoader
+from src.stt.whisper.whisper_stt import WhisperArchitecture
+from src.stt.dataset_for_train_loader import DatasetTrainLoader
 from src.config import settings
+from src.stt.training_args.whisper_training_args import training_args
 
 app = typer.Typer()
 
@@ -20,10 +21,10 @@ def load_student():
 def train(
     split: Annotated[SplitName, typer.Option("--split")]
 ):
-    dataset_loader = DatasetLoader(settings)
-    dataset = dataset_loader.load_dataset_for_train(split.value)
     student = load_student()
-    student.train(dataset)
+    dataset_loader = DatasetTrainLoader(settings, student.processor)
+    dataset = dataset_loader.load_dataset_for_train(split.value)
+    student.train(dataset, training_args)
 
 
 if __name__ == "__main__":
